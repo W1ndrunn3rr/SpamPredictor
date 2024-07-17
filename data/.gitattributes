@@ -1,0 +1,4 @@
+data.csv filter=lfs diff=lfs merge=lfs -text
+fake.txt filter=lfs diff=lfs merge=lfs -text
+predictor01.pkl filter=lfs diff=lfs merge=lfs -text
+real.txt filter=lfs diff=lfs merge=lfs -text
