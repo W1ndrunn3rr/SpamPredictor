@@ -6,7 +6,7 @@ from source import Scrapper
 
 
 class DataProcessing:
-    def __init__(self, scrapper):
+    def __init__(self):
         self.nlp = spacy.load("en_core_web_sm")
         self.nlp.add_pipe("sentencizer")
         self.nlp.add_pipe("asent_en_v1")
@@ -15,10 +15,9 @@ class DataProcessing:
         self.uniqueTokens = set()
         self.sentimentalScore = None
         self.tokens = 0
-        self.scrapper = scrapper
 
-    def ProcessText(self):
-        doc = self.nlp(self.scrapper.content)
+    def ProcessText(self, text):
+        doc = self.nlp(text)
         tokens = [
             token.text.lower() for token in doc if token.pos_ in self.wordDict.keys()
         ]
@@ -34,13 +33,9 @@ class DataProcessing:
 
         self.sentimentalScore = doc._.polarity
 
-    def ProcessURLData(self):
-        total_w = (
-            self.wordDict["NOUN"]
-            + self.wordDict["PROPN"]
-            + self.wordDict["VERB"]
-            + self.wordDict["ADV"]
-            + self.wordDict["ADJ"]
+    def ProcessData(self):
+        total_w = sum(
+            self.wordDict.get(tag, 0) for tag in ["NOUN", "PROPN", "VERB", "ADV", "ADJ"]
         )
 
         dataframe = {
@@ -70,24 +65,31 @@ class DataProcessing:
                 else 0
             ),
             "n_tokens": self.tokens,
-            "unique_tokens_r": round(len(self.uniqueTokens) / self.tokens, 3),
-            "nouns_r": round(self.wordDict["NOUN"] / total_w, 3),
-            "proper_nouns_r": round(self.wordDict["PROPN"] / total_w, 3),
-            "verbs_r": round(self.wordDict["VERB"] / total_w, 3),
-            "adverbs_r": round(self.wordDict["ADV"] / total_w, 3),
-            "adjectives_r": round(self.wordDict["ADJ"] / total_w, 3),
+            "unique_tokens_r": (
+                round(len(self.uniqueTokens) / self.tokens, 3) if self.tokens > 0 else 0
+            ),
+            "nouns_r": round(self.wordDict["NOUN"] / total_w, 3) if total_w > 0 else 0,
+            "proper_nouns_r": (
+                round(self.wordDict["PROPN"] / total_w, 3) if total_w > 0 else 0
+            ),
+            "verbs_r": round(self.wordDict["VERB"] / total_w, 3) if total_w > 0 else 0,
+            "adverbs_r": round(self.wordDict["ADV"] / total_w, 3) if total_w > 0 else 0,
+            "adjectives_r": (
+                round(self.wordDict["ADJ"] / total_w, 3) if total_w > 0 else 0
+            ),
             "article_tone": (
                 self.sentimentalScore.compound + self.sentimentalScore.neutral
                 if self.sentimentalScore is not None
+                and self.sentimentalScore.compound > 0
                 else 0
             ),
             "mean_sentence_length": (
                 self.tokens / self.sentimentalScore.n_sentences
                 if self.sentimentalScore is not None
+                and self.sentimentalScore.n_sentences > 0
                 else 0
             ),
         }
-        df = pd.DataFrame(dataframe, index=[0])
-        df = df.reset_index(drop=True)
+        df = pd.DataFrame(dataframe, index=[0]).reset_index(drop=True)
 
         return df
