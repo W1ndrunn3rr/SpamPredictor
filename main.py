@@ -23,7 +23,7 @@ def main():
 
     print(dataframe)
 
-    predictor = joblib.load("data/predictor_xgb.pkl")
+    predictor = joblib.load("data/predictor.pkl")
 
     model = Model(predictor)
 
