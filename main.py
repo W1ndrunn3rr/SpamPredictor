@@ -21,16 +21,17 @@ def main():
 
     dataframe = dp.ProcessData()
 
-    print(dataframe)
-
     predictor = joblib.load("data/predictor.pkl")
 
-    model = Model(predictor)
+    model = Model(predictor, dataframe)
 
-    proba = model.PredictProb(dataframe)
-    prediction = model.Predict(dataframe)
-
-    model.MakeRaport()
+    model.MakeRaport(
+        data,
+        dataframe,
+        source=(
+            scrapper.url if validators.url(parser.parse_args().data) else "User input"
+        ),
+    )
 
 
 if __name__ == "__main__":

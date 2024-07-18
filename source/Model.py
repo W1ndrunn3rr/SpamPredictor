@@ -1,21 +1,47 @@
+from datetime import datetime
+
+
 class Model:
-    def __init__(self, joblib_model):
+    def __init__(self, joblib_model, data):
         self.predictor = joblib_model
-        self.prediction = 0
-        self.proba = 0
+        self.proba = self.predictor.predict_proba(data)[:, 1][0]
+        self.prediction = False
         self.threshold = 0.4
 
-    def Predict(self, data):
-        self.prediction = (
-            self.predictor.predict_proba(data)[:, 1].astype(float)[0] > self.threshold
-        )
-        return self.prediction
+    def Predict(self):
+        self.prediction = self.proba > self.threshold
+        return
 
-    def PredictProb(self, data):
-        self.proba = self.predictor.predict_proba(data)[:, 1].astype(float)[0]
+    def PredictProba(self):
         return self.proba
 
-    def MakeRaport(self):
-        print(
-            f"-----------------RAPORT-----------------\nPrediction: {"Fake" if self.prediction == False else "Real"}\nProbability of prediction: {round((self.proba) * 100,2)}%\nThreshold: {self.threshold}\n----------------------------------------"
-        )
+    def MakeRaport(self, text, data, source="Unknown"):
+
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        accuracy = 0.8
+
+        report = f"""
+        News Analysis Report
+        -------------------------
+        Date and Time of Analysis: {current_time}
+
+        Analyzed Text: {text}
+
+        Analysis Result: {'Fake news' if self.prediction else 'Real news'}
+
+        Probability:
+            - Real news: {self.proba}
+            - Fake news: {1-self.proba}
+
+        Source of the message: {source}
+
+        Model Statistics:
+            - Model accuracy (estimated): {accuracy*100:.2f}%
+            - Model is adjusted to predict with a threshold of {self.threshold} probability.
+            - It is possible to adjust the threshold to increase the sensitivity or specificity of the model.
+
+        Recommendations:
+            - Verify the message from trusted sources.
+            - Consult an expert if in doubt.
+        """
+        print(report)
