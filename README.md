@@ -30,8 +30,8 @@ This dataframe provides a comprehensive analysis of the text, including sentimen
 For installation type in terminal :
 
 ```bash
-git clone https://github.com/yourusername/yourrepository.git
-cd yourrepository
+git clone https://github.com/W1ndrunn3rr/SpamPredictor/tree/main
+cd SpamPredictor
 pip install -r requirements.txt
 ```
 To clone the repository and install the required packages.
