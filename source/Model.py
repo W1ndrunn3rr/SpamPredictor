@@ -27,7 +27,7 @@ class Model:
 
         Analyzed Text: {text}
 
-        Analysis Result: {'Fake news' if self.prediction else 'Real news'}
+        Analysis Result: {'Real news' if self.prediction else 'Fake news'}
 
         Probability:
             - Real news: {self.proba}
